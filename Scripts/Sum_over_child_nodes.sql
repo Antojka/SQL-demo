@@ -47,7 +47,7 @@ VALUES
 	UNION ALL
 
 	SELECT
-		c.pid, 
+		c.Pid, 
 		c.id, 
 		CAST(CONCAT(Branch_id, '.', ROW_NUMBER() OVER(ORDER BY c.Id)) AS NVARCHAR(100)) AS Branch_id
 	FROM Cte_ids AS p
