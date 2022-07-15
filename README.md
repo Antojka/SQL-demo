@@ -1,3 +1,3 @@
 # SQL-examples
 
-![Alt text](https://github.com/Antojka/SQL-examples/raw/main/header.jpg | width=675px)
+<img src="https://github.com/Antojka/SQL-examples/raw/main/header.jpg" width="675" height="157">
