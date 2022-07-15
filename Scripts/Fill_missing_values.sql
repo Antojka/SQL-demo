@@ -46,7 +46,7 @@ FROM (
 		 202000 + VALUE AS Fin_period, 
 		'Penalty' AS Fin_item,
 		ABS(CHECKSUM(NEWID())) % 100 AS  Amount
-	FROM STRING_SPLIT('1,5,8,11', ',') -- 'ØThere is no Penalty in 2,3,4,6,7,9,10,12 months
+	FROM STRING_SPLIT('1,5,8,11', ',') -- 'There is no Penalty in 2,3,4,6,7,9,10,12 months
 ) AS t(Fin_period, Fin_item, Amount)
 
 
