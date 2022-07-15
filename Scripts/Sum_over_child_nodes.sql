@@ -35,8 +35,6 @@ VALUES
 
 --============================================================================================================================
 
-DROP TABlE IF EXISTS #Branchs
-
 ;WITH Cte_ids AS (
 
 	SELECT
@@ -57,12 +55,12 @@ DROP TABlE IF EXISTS #Branchs
 	ON p.Id = c.Pid
 ) 
 
-,Cte_branchs AS (
+,Cte_branches AS (
 
 	SELECT
 		Id,
 		Branch_id,
-		LEFT(Branch_id, 7) AS Cut_Branch_id,
+		LEFT(Branch_id, 7) AS Cut_branch_id,
 		5 AS N
 	FROM Cte_ids
 
@@ -71,28 +69,28 @@ DROP TABlE IF EXISTS #Branchs
 	SELECT 
 	    Id,
 		Branch_id,
-		LEFT(Cut_Branch_id, N) AS Cut_Branch_id,
+		LEFT(Cut_branch_id, N) AS Cut_branch_id,
 		N - 2 AS N
-	FROM Cte_branchs
+	FROM Cte_Branches
 	WHERE N - 2 > 0 	
 )
 
 ,Cte_agg AS (
 
 	SELECT 
-		Cut_Branch_id,
+		Cut_branch_id,
 		SUM(Amount) AS Amount
 	FROM [dbo].[tbl] AS t
 	INNER JOIN (
 		SELECT
 			Id,
 			Branch_id,
-			Cut_Branch_id
-		FROM Cte_branchs
-		WHERE LEN(Cut_Branch_id) = N + 2 
+			Cut_branch_id
+		FROM Cte_branches
+		WHERE LEN(Cut_branch_id) = N + 2 
 	) AS cut
 	ON t.id = cut.id
-	GROUP BY Cut_Branch_id
+	GROUP BY Cut_branch_id
 )
 
 --============================================================================================================================
@@ -107,4 +105,4 @@ FROM [dbo].[tbl] AS t
 INNER JOIN Cte_ids AS i
 ON t.Id = i.Id
 INNER JOIN Cte_agg AS agg
-ON i.Branch_id = agg.Cut_Branch_id
+ON i.Branch_id = agg.Cut_branch_id
