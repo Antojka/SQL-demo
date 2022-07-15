@@ -81,9 +81,9 @@ SET @Check_string = replace(@Check_string, '10,11,12', 'o,n,d') -- for function 
 				Fin_year,
 				STRING_AGG(
 					CASE WHEN Fin_month = 10 THEN N'o'  -- for function TRANSLATE change 10,11,12 to october, november, december
-						 WHEN Fin_month = 11 THEN N'n'
-						 WHEN Fin_month = 12 THEN N'd' 
-						 ELSE CAST(Fin_month AS NVARCHAR(1))
+						WHEN Fin_month = 11 THEN N'n'
+						WHEN Fin_month = 12 THEN N'd' 
+						ELSE CAST(Fin_month AS NVARCHAR(1))
 					END
 				, ',') AS Month_list
 			FROM dbo.tbl
@@ -103,9 +103,9 @@ FROM (
 	SELECT
 		Fin_year,
 		CASE WHEN VALUE = N'o' THEN N'10' 
-			 WHEN VALUE = N'n' THEN N'11'
-			 WHEN VALUE = N'd' THEN N'12' 
-			 ELSE VALUE
+			WHEN VALUE = N'n' THEN N'11'
+			WHEN VALUE = N'd' THEN N'12' 
+			ELSE VALUE
 		END AS Fin_month,
 		Fin_item,
 		0 AS Amount
