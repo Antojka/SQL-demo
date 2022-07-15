@@ -1,3 +1,3 @@
 # SQL-examples
 
-https://github.com/Antojka/SQL-examples/raw/main/header.jpg
+![Alt text](https://github.com/Antojka/SQL-examples/raw/main/header.jpg)
