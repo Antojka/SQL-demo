@@ -1,10 +1,19 @@
 USE db
 GO
 
-DROP TABLE IF EXISTS #t
+--============================================================================================================================
+-- CREATE TEST DATA
 
+DROP TABLE IF EXISTS [dbo].[tbl]
+
+CREATE TABLE [dbo].[tbl](
+	Pid INT, 
+	Id INT NOT NULL, 
+	Amount FLOAT NOT NULL
+)
+
+INSERT INTO [dbo].[tbl]
 SELECT Pid, Id, ABS(CHECKSUM(NEWID())) % 100 AS Amount
-INTO #t
 FROM (
 VALUES
 	(null, 1),
@@ -24,15 +33,17 @@ VALUES
 	(22, 222)
 ) AS t(Pid, Id)
 
-DROP TABlE IF EXISTS #Hierarchy
+--============================================================================================================================
+
+DROP TABlE IF EXISTS #Branchs
 
 ;WITH Cte_ids AS (
 
 	SELECT
 		Pid, 
 		Id, 
-		CAST(CONCAT(0, '.', ROW_NUMBER() OVER(ORDER BY Id)) AS NVARCHAR(100)) AS Hierarchy_id
-	FROM #t
+		CAST(CONCAT(0, '.', ROW_NUMBER() OVER(ORDER BY Id)) AS NVARCHAR(100)) AS Branch_id
+	FROM [dbo].[tbl]
 	WHERE Pid IS NULL -- Roots
 
 	UNION ALL
@@ -40,52 +51,60 @@ DROP TABlE IF EXISTS #Hierarchy
 	SELECT
 		c.pid, 
 		c.id, 
-		CAST(CONCAT(Hierarchy_id, '.', ROW_NUMBER() OVER(ORDER BY c.Id)) AS NVARCHAR(100)) AS Hierarchy_id
+		CAST(CONCAT(Branch_id, '.', ROW_NUMBER() OVER(ORDER BY c.Id)) AS NVARCHAR(100)) AS Branch_id
 	FROM Cte_ids AS p
-	INNER JOIN #t as c
+	INNER JOIN [dbo].[tbl] as c
 	ON p.Id = c.Pid
 ) 
 
-SELECT
-	Pid,
-	Id,
-	Hierarchy_id
-INTO #Hierarchy
-FROM Cte_ids 
-
-;WITH Cte_branchs AS (
+,Cte_branchs AS (
 
 	SELECT
 		Id,
-		Hierarchy_id,
-		LEFT(Hierarchy_id, 7) AS Cut_Hierarchy_id,
+		Branch_id,
+		LEFT(Branch_id, 7) AS Cut_Branch_id,
 		5 AS N
-	FROM #Hierarchy
+	FROM Cte_ids
 
 	UNION ALL
 
 	SELECT 
 	    Id,
-		Hierarchy_id,
-		LEFT(Cut_Hierarchy_id, N) AS  Cut_Hierarchy_id,
+		Branch_id,
+		LEFT(Cut_Branch_id, N) AS Cut_Branch_id,
 		N - 2 AS N
 	FROM Cte_branchs
-	WHERE N - 2 > 0 
-	
+	WHERE N - 2 > 0 	
 )
 
-SELECT 
-	Cut_Hierarchy_id,
-	SUM(Amount) AS Amount
-FROM #t AS t
-INNER JOIN (
-	SELECT
-		Id,
-		Hierarchy_id,
-		Cut_Hierarchy_id
-	FROM Cte_branchs
-	WHERE LEN(Cut_Hierarchy_id) = N + 2 
-) AS cut
-ON t.id = cut.id
-GROUP BY Cut_Hierarchy_id
+,Cte_agg AS (
 
+	SELECT 
+		Cut_Branch_id,
+		SUM(Amount) AS Amount
+	FROM [dbo].[tbl] AS t
+	INNER JOIN (
+		SELECT
+			Id,
+			Branch_id,
+			Cut_Branch_id
+		FROM Cte_branchs
+		WHERE LEN(Cut_Branch_id) = N + 2 
+	) AS cut
+	ON t.id = cut.id
+	GROUP BY Cut_Branch_id
+)
+
+--============================================================================================================================
+-- TEST
+
+SELECT
+	t.Pid,
+	t.Id,
+	t.Amount,
+	agg.Amount as Acc_childs_amount
+FROM [dbo].[tbl] AS t
+INNER JOIN Cte_ids AS i
+ON t.Id = i.Id
+INNER JOIN Cte_agg AS agg
+ON i.Branch_id = agg.Cut_Branch_id
