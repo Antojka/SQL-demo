@@ -2,7 +2,7 @@ USE db
 GO
 
 --===============================================================================================
--- Создание тестовых данных
+-- CREATE TEST DATA
 
 DROP TABLE IF EXISTS dbo.tbl
 
@@ -20,7 +20,7 @@ SELECT
 FROM (
 	SELECT 
 		 202000 + VALUE AS Fin_period, 
-		'Зарплата' AS Fin_item,
+		'Salaty' AS Fin_item,
 		ABS(CHECKSUM(NEWID())) % 100 AS  Amount
 	FROM STRING_SPLIT('1,2,3,4,5,6,7,8,9,10,11,12', ',')
 
@@ -28,7 +28,7 @@ FROM (
 
 	SELECT 
 		 202000 + VALUE AS Fin_period, 
-		'Аренда' AS Fin_item,
+		'Rent' AS Fin_item,
 		ABS(CHECKSUM(NEWID())) % 100 AS  Amount
 	FROM STRING_SPLIT('1,2,3,4,5,6,7,8,9,10,11,12', ',')
 
@@ -36,37 +36,34 @@ FROM (
 
 	SELECT 
 		 202000 + VALUE AS Fin_period, 
-		'Командировки' AS Fin_item,
+		'Business trips' AS Fin_item,
 		ABS(CHECKSUM(NEWID())) % 100 AS  Amount
-	FROM STRING_SPLIT('1,2,5,6,7,8,10,11', ',') -- Командировок нет в 3,4,9,12 месяцах
+	FROM STRING_SPLIT('1,2,5,6,7,8,10,11', ',') -- There is no Business trip in 3,4,9,12 months
 
 	UNION ALL
 
 	SELECT 
 		 202000 + VALUE AS Fin_period, 
-		'Штрафы' AS Fin_item,
+		'Penalty' AS Fin_item,
 		ABS(CHECKSUM(NEWID())) % 100 AS  Amount
-	FROM STRING_SPLIT('1,5,8,11', ',') -- 'Штрафов нет в 2,3,4,6,7,9,10,12 месяцах
+	FROM STRING_SPLIT('1,5,8,11', ',') -- 'ШThere is no Penalty in 2,3,4,6,7,9,10,12 months
 ) AS t(Fin_period, Fin_item, Amount)
 
-
---===============================================================================================
--- Для быстрой агрегации и сортировки
 
 ALTER TABLE dbo.tbl ADD Fin_year AS CAST(LEFT(Fin_period, 4) AS INT), Fin_month AS CAST(RIGHT(Fin_period, 2) AS INT)
 
 CREATE INDEX IX_item_period ON dbo.tbl(Fin_item, Fin_year, Fin_month)
 
 --===============================================================================================
--- Процедура по добавлению пропущенных значений
+-- PROCEDURE ADD ZERO IN MISSING MONTHS
 
 CREATE OR ALTER PROCEDURE dbo.Fill_missing_values
 AS
 BEGIN
 
-DECLARE @Check_string NVARCHAR(26) = N'1,2,3,4,5,6,7,8,9,10,11,12' -- обязательный набор месяцев
+DECLARE @Check_string NVARCHAR(26) = N'1,2,3,4,5,6,7,8,9,10,11,12' -- required month set
 
-SET @Check_string = replace(@Check_string, '10,11,12', 'o,n,d') -- для работы TRANSLATE меняем 10,11,12 на october, november, december
+SET @Check_string = replace(@Check_string, '10,11,12', 'o,n,d') -- for function TRANSLATE change 10,11,12 to october, november, december
 
 ;WITH Cte_need_add AS (
 	SELECT
@@ -83,7 +80,7 @@ SET @Check_string = replace(@Check_string, '10,11,12', 'o,n,d') -- для работы TR
 				Fin_item,
 				Fin_year,
 				STRING_AGG(
-					CASE WHEN Fin_month = 10 THEN N'o'  -- для работы TRANSLATE меняем 10,11,12 на october, november, december
+					CASE WHEN Fin_month = 10 THEN N'o'  -- for function TRANSLATE change 10,11,12 to october, november, december
 						 WHEN Fin_month = 11 THEN N'n'
 						 WHEN Fin_month = 12 THEN N'd' 
 						 ELSE CAST(Fin_month AS NVARCHAR(1))
@@ -94,7 +91,7 @@ SET @Check_string = replace(@Check_string, '10,11,12', 'o,n,d') -- для работы TR
 				Fin_item, 
 				Fin_year
 		) AS t
-		WHERE Month_list != @Check_string --IX_item_period обеспечивае корректный порядок для сравнения 
+		WHERE Month_list != @Check_string --IX_item_period provide correct order
 	) AS t
 )
 
@@ -120,6 +117,6 @@ END
 ;
 
 --===============================================================================================
--- ТЕСТ
+-- TEST
 
 EXEC dbo.Fill_missing_values
