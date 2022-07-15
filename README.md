@@ -5,7 +5,7 @@
 № | Раздел | Описание |
 :-|:-------|:---------|
 
-<img src="https://github.com/Antojka/SQL-examples/raw/main/header.jpg" width="500" height="116" style="text-align:center">
+<img src="https://github.com/Antojka/SQL-examples/raw/main/header.jpg" width="500" height="116" style="text-align:center;display:block">
 
 ## Tech Stack
 * Main language:        T-SQL
