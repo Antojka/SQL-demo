@@ -109,6 +109,3 @@ END
 SELECT dbo.Get_N_member_Fibonachi_seq(100) AS FIBO
 
 
-set statistics time on
-
-
