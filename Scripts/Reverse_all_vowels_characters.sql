@@ -1,4 +1,4 @@
-DECLARE @Str AS NVARCHAR(MAX) = 'Streng fur oor tist'
+DECLARE @Phrase AS NVARCHAR(MAX) = 'Streng fur oor tist'
 DECLARE @Vowels AS NVARCHAR(MAX) = 'aeiou'
 
 ;WITH Cte AS (
@@ -12,10 +12,10 @@ DECLARE @Vowels AS NVARCHAR(MAX) = 'aeiou'
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY (SELECT NULL)) AS R,
 			SUBSTRING(s.s, t.n + 1, 1) AS char_
-		FROM (SELECT @STR s) s
+		FROM (SELECT @Phrase s) s
 		INNER JOIN (
 			SELECT ROW_NUMBER() OVER(ORDER BY VALUE) - 1 AS n
-			FROM STRING_SPLIT(REPLICATE('#', LEN(@Str) + 1), '#')
+			FROM STRING_SPLIT(REPLICATE('#', LEN(@Phrase) + 1), '#')
 		) AS t 
 		ON t.n < LEN(s.s)
 	) AS t
