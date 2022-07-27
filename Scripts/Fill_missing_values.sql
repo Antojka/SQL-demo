@@ -20,7 +20,7 @@ SELECT
 FROM (
 	SELECT 
 		 202000 + VALUE AS Fin_period, 
-		'Salaty' AS Fin_item,
+		'Salary' AS Fin_item,
 		ABS(CHECKSUM(NEWID())) % 100 AS  Amount
 	FROM STRING_SPLIT('1,2,3,4,5,6,7,8,9,10,11,12', ',')
 
