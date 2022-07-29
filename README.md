@@ -9,3 +9,4 @@
 3 | [Get_N_member_Fibonachi_seq](https://github.com/Antojka/SQL-demo/blob/main/Scripts/Get_N_member_Fibonachi_seq.sql) | Расчет N-го члена последовательности Фибоначи.|
 4 | [Reverse_all_vowels_chars](https://github.com/Antojka/SQL-demo/blob/main/Scripts/Reverse_all_vowels_chars.sql) | Поменять порядок все гласных букв в строке.|
 5 | [Restore_records_from_log](https://github.com/Antojka/SQL-demo/blob/main/Scripts/Restore_records_from_log.sql) | Унифицированное ведение логов с помощью JSON и востановление удаленых записей из JSON. |
+6 | [Roman_to_integer](https://github.com/Antojka/SQL-demo/blob/main/Scripts/Roman_to_integer.sql) | Перевести римские цифры в целые. |
